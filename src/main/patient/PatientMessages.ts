@@ -1,0 +1,5 @@
+export enum PatientMessages {
+  SYNC_START = 'PATIENT_SYNC_START',
+  SYNC_EVENT = 'PATIENT_SYNC_EVENT',
+  READ = 'PATIENT_READ',
+}
