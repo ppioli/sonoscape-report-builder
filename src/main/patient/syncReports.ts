@@ -1,7 +1,6 @@
 import { readdir, stat } from 'node:fs/promises';
 import path from 'path';
 import fs from 'fs/promises';
-import convert from 'xml-js';
 import { XMLParser } from 'fast-xml-parser';
 import { ClientException } from '../exception/ClientException';
 import {
@@ -79,30 +78,29 @@ async function syncReport(master: string, patient: string, report: string) {
     patientXmlFile[0]
   );
 
+  // Parse and update the patient
+  const patientRepository = db.getRepository(Patient);
+  const reportRepository = db.getRepository(Report);
   const parsedPatient = await parsePatientDate(patientDataFilePath);
+  let existingPatient = await patientRepository.findOne({
+    where: {
+      id: parsedPatient.id,
+    },
+  });
+  if (!existingPatient) {
+    existingPatient = await patientRepository.save(new Patient(parsedPatient));
+  }
+  const existingReport = await reportRepository.findOneBy({
+    id: report,
+  });
   const parsedReport = new Report({
     id: report,
     done: false,
     createdAt: new Date(),
+    patient: existingPatient,
   });
-  const repo = db.getRepository(Patient);
-
-  const existing =
-    (await repo.findOne({
-      where: {
-        id: parsedPatient.id,
-      },
-      relations: {
-        reports: true,
-      },
-    })) ?? new Patient(parsedPatient);
-  if (!existing.reports) {
-    existing.reports = [];
-  }
-  const existingReport = existing.reports.find((s) => s.id === report);
   if (!existingReport) {
-    existing.reports.push(parsedReport);
-    repo.save(existing);
+    await reportRepository.save(new Report(parsedReport));
   }
   return PatientSyncEventStatus.DONE;
 }

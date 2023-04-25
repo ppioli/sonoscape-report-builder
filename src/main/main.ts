@@ -1,13 +1,3 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
-
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
@@ -17,8 +7,9 @@ import { resolveHtmlPath } from './util';
 import { registerConfigApi } from './config/registerConfigApi';
 import { registerPatientApi } from './patient/registerPatientApi';
 import { registerFileApi } from './file/registerFileApi';
-import { db } from './db/db';
+import { initializeDatabase } from './db/db';
 import Logger from './Logger';
+import { registerReportApi } from './report/registerReportApi';
 
 class AppUpdater {
   constructor() {
@@ -62,6 +53,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
+  Logger.info('Called createWindow');
   if (isDebug) {
     await installExtensions();
   }
@@ -79,6 +71,12 @@ const createWindow = async () => {
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#2f3241',
+      symbolColor: '#74b1be',
+      height: 60,
+    },
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -116,6 +114,7 @@ const createWindow = async () => {
   registerConfigApi(mainWindow);
   registerPatientApi(mainWindow);
   registerFileApi(mainWindow);
+  registerReportApi(mainWindow);
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -133,9 +132,12 @@ app.on('window-all-closed', () => {
   }
 });
 
-Promise.all([app.whenReady(), db()])
-  .then(() => {
-    createWindow();
+app
+  .whenReady()
+  .then(async () => {
+    await initializeDatabase();
+    Logger.info('App ready');
+    await createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

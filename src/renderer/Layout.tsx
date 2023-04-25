@@ -64,6 +64,9 @@ export function Layout({ children }: { children: ReactNode }) {
         <div className="navbar-center flex">
           <ul className="menu menu-horizontal px-1">
             <li>
+              <Link to="/reports">Reportes</Link>
+            </li>
+            <li>
               <Link to="/patient">Pacientes</Link>
             </li>
             {/* <li tabIndex={0}> */}

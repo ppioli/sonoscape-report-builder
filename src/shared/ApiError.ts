@@ -1,5 +1,10 @@
 export interface ApiError {
   message: string;
+  code?: ApiErrorCode;
+}
+
+export enum ApiErrorCode {
+  NOT_CONTENT = 'NO_CONTENT',
 }
 
 export function createError(e: any): ApiError {

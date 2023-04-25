@@ -4,6 +4,7 @@ import { Patient } from './model/Patient';
 import { AppDataDir } from '../config/registerConfigApi';
 import Logger from '../Logger';
 import { Report } from './model/Report';
+import { Image } from './model/Image';
 
 const _dataSource: DataSource = new DataSource({
   type: 'sqlite',
@@ -11,10 +12,10 @@ const _dataSource: DataSource = new DataSource({
   logging: true,
   logger: 'simple-console',
   database: path.join(AppDataDir, 'database.sqlite'),
-  entities: [Patient, Report],
+  entities: [Image, Patient, Report],
 });
 
-export function db() {
+export function initializeDatabase() {
   // to initialize initial connection with the database, register all entities
   // and "synchronize" database schema, call "initialize()" method of a newly created database
   // once in your application bootstrap
