@@ -1,10 +1,10 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Image as IImage } from '../../../shared/model/Image';
+import { ImageData } from '../../../shared/model/ImageData';
 import { Report } from './Report';
 
 @Entity()
-export class Image implements IImage {
-  constructor(props?: IImage) {
+export class Image implements ImageData {
+  constructor(props?: ImageData) {
     this.id = props?.id ?? '';
     this.fileName = props?.fileName ?? '';
   }

@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs/promises';
-import { Config, defaultConfig } from '../../shared/model/Config';
+import { ConfigData, defaultConfig } from '../../shared/model/ConfigData';
 import { ConfigMessages } from './ConfigMessages';
 import { ApiResponse, noResponse, okResponse } from '../../shared/ApiResponse';
 import Logger from '../Logger';
@@ -18,7 +18,8 @@ const ensureConfigDirExists = async () => {
   });
 };
 
-export const getConfig = async (): Promise<Config> => {
+// TODO Cache this
+export const getConfig = async (): Promise<ConfigData> => {
   try {
     await ensureConfigDirExists();
     return await fs
@@ -32,10 +33,9 @@ export const getConfig = async (): Promise<Config> => {
   }
 };
 export function registerConfigApi(window: BrowserWindow) {
-  const _window = window;
   ipcMain.handle(
     ConfigMessages.READ,
-    async (): Promise<ApiResponse<Config>> => {
+    async (): Promise<ApiResponse<ConfigData>> => {
       try {
         const config = await getConfig();
         return okResponse(config);
@@ -44,7 +44,7 @@ export function registerConfigApi(window: BrowserWindow) {
       }
     }
   );
-  ipcMain.handle(ConfigMessages.SAVE, async (evt: any, config: Config) => {
+  ipcMain.handle(ConfigMessages.SAVE, async (evt: any, config: ConfigData) => {
     Logger.info('Saving config file', config);
     try {
       await ensureConfigDirExists();

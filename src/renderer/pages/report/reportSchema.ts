@@ -7,13 +7,13 @@ import {
   boolean,
   array,
 } from 'yup';
-import { Report } from '../../../shared/model/Report';
-import { Measurements } from '../../../shared/model/Measurements';
-import { FlujosDoppler } from '../../../shared/model/FlujosDoppler';
-import { Image } from '../../../shared/model/Image';
-import { Patient } from '../../../shared/model/Patient';
+import { ReportData } from '../../../shared/model/ReportData';
+import { MeasurementsData } from '../../../shared/model/MeasurementsData';
+import { DopplerFlowData } from '../../../shared/model/DopplerFlowData';
+import { ImageData } from '../../../shared/model/ImageData';
+import { PatientData } from '../../../shared/model/PatientData';
 
-const measurementSchema: ObjectSchema<Measurements> = object().shape({
+const measurementSchema: ObjectSchema<MeasurementsData> = object().shape({
   ao: number().required(),
   ai: number().required(),
   vidd: number().required(),
@@ -36,7 +36,7 @@ const measurementSchema: ObjectSchema<Measurements> = object().shape({
   pericardio: string().required(),
 });
 
-const flujosDopplerSchema: ObjectSchema<FlujosDoppler> = object().shape({
+const flujosDopplerSchema: ObjectSchema<DopplerFlowData> = object().shape({
   aortico: string().required(),
   mitral: string().required(),
   pulmonar: string().required(),
@@ -44,22 +44,20 @@ const flujosDopplerSchema: ObjectSchema<FlujosDoppler> = object().shape({
   conclusiones: string().required(),
 });
 
-const imageSchema: ObjectSchema<Image> = object().shape({
+const imageSchema: ObjectSchema<ImageData> = object().shape({
   id: string().required(),
   fileName: string().required(),
 });
 
-const patientInstanceSchema: ObjectSchema<Patient> = object().shape({
-  id: string().required(),
+const patientInstanceSchema: ObjectSchema<PatientData> = object().shape({
   firstName: string().required(),
   lastName: string().required(),
-  dni: string().required(),
   age: string().required(),
   weight: number().required(),
   size: string().required(),
 });
 
-export const reportSchema: ObjectSchema<Report> = object().shape({
+export const reportSchema: ObjectSchema<ReportData> = object().shape({
   id: string().required(),
   createdAt: date().required(),
   done: boolean().required(),

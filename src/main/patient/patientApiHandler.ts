@@ -1,12 +1,12 @@
 import { ipcRenderer } from 'electron';
 import { ApiResponse } from '../../shared/ApiResponse';
 import { PatientMessages } from './PatientMessages';
-import { Config } from '../../shared/model/Config';
+import { ConfigData } from '../../shared/model/ConfigData';
 import { PatientApi } from '../../shared/api/PatientApi';
 import { PatientSyncEvent } from '../../shared/responses/PatientSyncEvent';
 
 export const patientApiHandler: PatientApi = {
-  read(): Promise<ApiResponse<Config>> {
+  read(): Promise<ApiResponse<ConfigData>> {
     return ipcRenderer.invoke(PatientMessages.READ);
   },
   syncStart() {

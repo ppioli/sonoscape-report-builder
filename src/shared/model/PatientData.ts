@@ -1,10 +1,6 @@
-import { Report } from './Report';
-
-export interface Patient {
-  id: string;
+export interface PatientData {
   firstName: string;
   lastName: string;
-  dni: string;
   age: string;
   weight: number;
   size: string;

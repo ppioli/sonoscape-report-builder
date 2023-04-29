@@ -1,59 +1,42 @@
-import { BrowserWindow, ipcMain } from 'electron';
-import fs from 'fs/promises';
-import { randomUUID } from 'crypto'; // Added in: node v14.17.0
-import { Config } from '../../shared/model/Config';
+import { ipcMain } from 'electron';
 import { ReportMessages } from './ReportMessages';
-import {
-  ApiResponse,
-  noContentResponse,
-  noResponse,
-  okResponse,
-} from '../../shared/ApiResponse';
+import { ApiResponse, noResponse, okResponse } from '../../shared/ApiResponse';
 import Logger from '../Logger';
-import { Report as IReport } from '../../shared/model/Report';
-import db from '../db/db';
+import { ReportData } from '../../shared/model/ReportData';
+import reportService from './ReportService';
 import { Report } from '../db/model/Report';
 
-export function registerReportApi(window: BrowserWindow) {
-  const _window = window;
-  const _reportRepository = db.getRepository(Report);
+export function registerReportApi() {
   ipcMain.handle(
     ReportMessages.READ,
-    async (_, reportId: string): Promise<ApiResponse<IReport>> => {
+    async (_, reportId: string): Promise<ApiResponse<Report>> => {
       Logger.info('Read report api called', reportId);
       try {
-        const report = await _reportRepository.findOneBy({ id: reportId });
-        if (!report) {
-          return noContentResponse();
-        }
+        const report = await reportService.reportGet(reportId);
         return okResponse(report);
       } catch (error: any) {
         return noResponse(error);
       }
     }
   );
-  ipcMain.handle(ReportMessages.SAVE, async (evt: any, report: IReport) => {
-    Logger.info('Saving report file', report);
-    try {
-      if (!report.id) {
-        report.id = randomUUID();
+  ipcMain.handle(
+    ReportMessages.SAVE,
+    async (evt: any, id: string, report: ReportData) => {
+      Logger.info('Saving report file', report);
+      try {
+        const result = await reportService.reportUpdate(id, report);
+        return okResponse(result);
+      } catch (err: any) {
+        return noResponse(err);
       }
-      const result = await _reportRepository.save(report);
-      return okResponse(result);
-    } catch (err: any) {
-      return noResponse(err);
     }
-  });
+  );
   ipcMain.handle(ReportMessages.LIST, async (evt: any, params) => {
     Logger.info('Listing reports', params);
     try {
       const filter = params.pending ? { done: false } : {};
-      const result = await _reportRepository.find({
-        where: filter,
-        relations: {
-          patient: true,
-        },
-      });
+      const result = await reportService.reportList(filter);
+      Logger.info('List report ok', result);
       return okResponse(result);
     } catch (err: any) {
       return noResponse(err);

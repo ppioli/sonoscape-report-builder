@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { PatientMessages } from './PatientMessages';
 import { ApiResponse, noResponse, okResponse } from '../../shared/ApiResponse';
-import { Patient } from '../../shared/model/Patient';
+import { PatientData } from '../../shared/model/PatientData';
 import Logger from '../Logger';
 import { getConfig } from '../config/registerConfigApi';
 import { readMaster } from './syncReports';
@@ -20,9 +20,12 @@ export function registerPatientApi(window: BrowserWindow) {
 
   ipcMain.handle(
     PatientMessages.READ,
-    async (event: any, patientId: string): Promise<ApiResponse<Patient>> => {
+    async (
+      event: any,
+      patientId: string
+    ): Promise<ApiResponse<PatientData>> => {
       try {
-        const patient: Patient = {
+        const patient: PatientData = {
           id: patientId,
           firstName: 'Pablo',
           lastName: 'Pioli',

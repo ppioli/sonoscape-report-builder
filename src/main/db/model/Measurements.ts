@@ -1,8 +1,11 @@
-import { Measurements as IMeasurement } from '../../../shared/model/Measurements';
 import { Column } from 'typeorm';
+import {
+  defaultMeasurements,
+  MeasurementsData,
+} from '../../../shared/model/MeasurementsData';
 
-export class Measurements implements IMeasurement {
-  constructor(props?: IMeasurement) {
+export class Measurements implements MeasurementsData {
+  constructor(props: MeasurementsData = defaultMeasurements()) {
     this.ad = props?.ad ?? 0;
     this.ai = props?.ai ?? 0;
     this.ao = props?.ao ?? 0;

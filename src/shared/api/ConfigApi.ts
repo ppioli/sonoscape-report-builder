@@ -1,7 +1,7 @@
 import { ApiResponse } from '../ApiResponse';
-import { Config } from '../model/Config';
+import { ConfigData } from '../model/ConfigData';
 
 export interface ConfigApi {
-  read(): Promise<ApiResponse<Config>>;
-  save(config: Config): Promise<ApiResponse<boolean>>;
+  read(): Promise<ApiResponse<ConfigData>>;
+  save(config: ConfigData): Promise<ApiResponse<boolean>>;
 }

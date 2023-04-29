@@ -1,28 +1,30 @@
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryColumn,
-} from 'typeorm';
-import { Report as IReport } from '../../../shared/model/Report';
-import { Patient, PatientInstance } from './Patient';
+  ReportData,
+  ReportData as IReport,
+} from '../../../shared/model/ReportData';
+import { Patient } from './Patient';
 import { Measurements } from './Measurements';
-import { FlujosDoppler } from './FlujosDoppler';
+import { DopplerFlow } from './DopplerFlow';
 import { Image } from './Image';
-import { createDefaultPatient } from '../../../shared/model/Patient';
+import { PatientInstance } from './PatientInstance';
 
+interface ReportProps extends ReportData {
+  id?: string;
+  patient: Patient;
+}
 @Entity()
 export class Report implements IReport {
-  constructor(props?: IReport, patient?: Patient) {
+  constructor(props?: ReportProps) {
     this.createdAt = props?.createdAt ?? new Date();
     this.done = props?.done ?? false;
-    this.id = props?.id ?? '';
+    this.id = props?.id ?? uuidv4();
     this.measurements = props?.measurements ?? new Measurements();
     this.patientInstance = props?.patientInstance ?? new PatientInstance();
-    this.flow = props?.flow ?? new FlujosDoppler();
-    this.patient = patient;
+    this.flow = props?.flow ?? new DopplerFlow();
+    this.patient = props?.patient ?? new Patient();
+    this.patientId = this.patient.id;
   }
 
   @Column()
@@ -35,7 +37,9 @@ export class Report implements IReport {
   id: string;
 
   @ManyToOne(() => Patient, (patient) => patient.reports)
-  patient?: Patient;
+  patient: Patient;
+
+  patientId: string;
 
   @Column(() => PatientInstance)
   patientInstance: PatientInstance;
@@ -43,8 +47,8 @@ export class Report implements IReport {
   @Column(() => Measurements)
   measurements: Measurements;
 
-  @Column(() => FlujosDoppler)
-  flow: FlujosDoppler;
+  @Column(() => DopplerFlow)
+  flow: DopplerFlow;
 
   @OneToMany(() => Image, (image) => image.report)
   images!: Image[];

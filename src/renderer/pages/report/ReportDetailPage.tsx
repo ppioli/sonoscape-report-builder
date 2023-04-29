@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useApi } from '../../hooks/useApi';
 import { reportSchema } from './reportSchema';
-import { Report } from '../../../shared/model/Report';
+import { ReportData } from '../../../shared/model/ReportData';
 import { Input } from './Input';
+import { ImageList } from './ImageList';
 
 export function ReportDetailPage() {
   const params = useParams();
@@ -28,18 +29,38 @@ export function ReportDetailPage() {
   );
 }
 
-function ReportForm({ report }: { report: Report }) {
-  const { handleSubmit, register } = useForm({
+function ReportForm({ report }: { report: ReportData }) {
+  const { handleSubmit, register, control } = useForm({
     resolver: yupResolver(reportSchema),
     defaultValues: report,
   });
 
-  const onSubmit = (value: Report) => {
+  const onSubmit = (value: ReportData) => {
     console.log(value);
   };
 
   return (
     <form>
+      <fieldset>
+        <Input
+          input={{ ...register('createdAt'), type: 'date' }}
+          label="Fecha"
+        />
+        <Input input={register('done')} />
+      </fieldset>
+      <fieldset>
+        <Input label="Nombre" input={register('patientInstance.firstName')} />
+        <Input label="Apellido" input={register('patientInstance.lastName')} />
+        <Input label="Edad" input={register('patientInstance.age')} />
+        <Input
+          label="Peso"
+          input={{
+            type: 'number',
+            ...register('patientInstance.weight', { valueAsNumber: true }),
+          }}
+        />
+        <Input label="Talla" input={register('patientInstance.size')} />
+      </fieldset>
       <fieldset>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -97,6 +118,9 @@ function ReportForm({ report }: { report: Report }) {
           label="Pericardio"
           input={register('measurements.valvulaTricuspidea')}
         />
+      </fieldset>
+      <fieldset>
+        <ImageList control={control} name="images" />
       </fieldset>
 
       <button type="submit" className="btn">

@@ -1,17 +1,17 @@
 import { object, ObjectSchema, string } from 'yup';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Config } from '../../../shared/model/Config';
+import { ConfigData } from '../../../shared/model/ConfigData';
 import { useApi } from '../../hooks/useApi';
 import { ErrorPage } from '../../ErrorPage';
 import { api } from '../../api';
 import { isApiError } from '../../../shared/ApiResponse';
 
-const configSchema: ObjectSchema<Config> = object().shape({
+const configSchema: ObjectSchema<ConfigData> = object().shape({
   masterDir: string().required(),
 });
 
-function ConfigForm({ config }: { config: Config }) {
+function ConfigForm({ config }: { config: ConfigData }) {
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: config,
     resolver: yupResolver(configSchema),
@@ -33,7 +33,7 @@ function ConfigForm({ config }: { config: Config }) {
     }
     setValue('masterDir', selectedDir ?? '');
   };
-  const onSubmit: SubmitHandler<Config> = async (value) => {
+  const onSubmit: SubmitHandler<ConfigData> = async (value) => {
     console.log('submit');
     try {
       const response = await api.config.save(value);
@@ -91,7 +91,7 @@ function ConfigForm({ config }: { config: Config }) {
 }
 
 export function ConfigPage() {
-  const { loading, value, error } = useApi((api) => api.config.read(), []);
+  const { loading, value, error } = useApi((a) => a.config.read(), []);
 
   if (!value) {
     if (loading) {

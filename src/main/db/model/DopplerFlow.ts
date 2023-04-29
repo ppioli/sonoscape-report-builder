@@ -1,8 +1,8 @@
-import { FlujosDoppler as IFlujosDoppler } from '../../../shared/model/FlujosDoppler';
 import { Column } from 'typeorm';
+import { DopplerFlowData } from '../../../shared/model/DopplerFlowData';
 
-export class FlujosDoppler implements IFlujosDoppler {
-  constructor(props?: IFlujosDoppler) {
+export class DopplerFlow implements DopplerFlowData {
+  constructor(props?: DopplerFlowData) {
     this.aortico = props?.aortico ?? '';
     this.conclusiones = props?.conclusiones ?? '';
     this.mitral = props?.mitral ?? '';

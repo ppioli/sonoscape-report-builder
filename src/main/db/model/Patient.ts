@@ -1,43 +1,23 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { Patient as IPatient } from '../../../shared/model/Patient';
+import { Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Report } from './Report';
+import { PatientInstance } from './PatientInstance';
+import { PatientData } from '../../../shared/model/PatientData';
 
+interface PatientProps extends PatientData {
+  id?: string;
+  reports: Report[];
+}
 @Entity()
-export class PatientInstance implements IPatient {
-  constructor(props?: Omit<IPatient, 'reports'>) {
-    this.id = props?.id ?? '';
-    this.firstName = props?.firstName ?? '';
-    this.lastName = props?.lastName ?? '';
-    this.dni = props?.dni ?? '';
-    this.weight = props?.weight ?? 0;
-    this.age = props?.age ?? '';
-    this.size = props?.size ?? '';
+export class Patient extends PatientInstance {
+  constructor(props?: PatientProps) {
+    super(props);
+    this.id = props?.id ?? uuidv4();
   }
 
   @PrimaryColumn()
-  public id: string;
+  id: string;
 
-  @Column()
-  public firstName: string;
-
-  @Column()
-  public lastName: string;
-
-  @Column()
-  dni: string;
-
-  @Column()
-  age: string;
-
-  @Column()
-  weight: number;
-
-  @Column()
-  size: string;
-}
-
-@Entity()
-export class Patient extends PatientInstance {
   @OneToMany(() => Report, (report) => report.patient)
   reports!: Report[];
 }

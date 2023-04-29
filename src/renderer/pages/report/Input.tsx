@@ -8,6 +8,7 @@ export function Input({
   label?: string;
   input: HTMLProps<HTMLInputElement>;
 }) {
+  const { type, className, ...rest } = input;
   return (
     <div className="form-control">
       {label && (
@@ -16,11 +17,9 @@ export function Input({
         </div>
       )}
       <input
-        type="text"
-        className={classNames(
-          'file-input w-full input-bordered',
-          input.className
-        )}
+        {...rest}
+        type={type ?? 'text'}
+        className={classNames('file-input w-full input-bordered', className)}
       />
     </div>
   );

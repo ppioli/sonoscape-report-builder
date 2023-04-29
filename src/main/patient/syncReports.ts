@@ -8,10 +8,12 @@ import {
   PatientSyncEventStatus,
 } from '../../shared/responses/PatientSyncEvent';
 import Logger from '../Logger';
-import { Patient as IPatient } from '../../shared/model/Patient';
 import db from '../db/db';
 import { Patient } from '../db/model/Patient';
 import { Report } from '../db/model/Report';
+import { ReportData } from '../../shared/model/ReportData';
+import { defaultFlowData } from '../../shared/model/DopplerFlowData';
+import { defaultMeasurements } from '../../shared/model/MeasurementsData';
 
 async function getAllDirectories(directory: string) {
   const reports = await readdir(directory);
@@ -28,9 +30,9 @@ async function getAllDirectories(directory: string) {
   return fileList.filter((file) => file.isDirectory).map((file) => file.file);
 }
 
-async function parsePatientDate(
+async function parsePatientData(
   path: string
-): Promise<Omit<IPatient, 'reports'>> {
+): Promise<[string, string, ReportData]> {
   try {
     const fileData = await fs.readFile(path, {
       encoding: 'utf8',
@@ -47,11 +49,24 @@ async function parsePatientDate(
     db.getRepository(Patient);
     Logger.info(exam);
 
-    return {
-      id: p.PatientID,
-      firstName: p.PatientName,
-      lastName: p.PatientName,
-    };
+    return [
+      p.ID,
+      p.Id,
+      {
+        createdAt: new Date(),
+        done: false,
+        images: [],
+        patientInstance: {
+          firstName: p.PatientName,
+          lastName: p.PatientName,
+          age: p.age,
+          size: p.size,
+          weight: p.weight,
+        },
+        flow: defaultFlowData(),
+        measurements: defaultMeasurements(),
+      },
+    ];
   } catch (err) {
     // todo handle error
     throw err;
@@ -81,27 +96,27 @@ async function syncReport(master: string, patient: string, report: string) {
   // Parse and update the patient
   const patientRepository = db.getRepository(Patient);
   const reportRepository = db.getRepository(Report);
-  const parsedPatient = await parsePatientDate(patientDataFilePath);
-  let existingPatient = await patientRepository.findOne({
-    where: {
-      id: parsedPatient.id,
-    },
-  });
-  if (!existingPatient) {
-    existingPatient = await patientRepository.save(new Patient(parsedPatient));
-  }
-  const existingReport = await reportRepository.findOneBy({
-    id: report,
-  });
-  const parsedReport = new Report({
-    id: report,
-    done: false,
-    createdAt: new Date(),
-    patient: existingPatient,
-  });
-  if (!existingReport) {
-    await reportRepository.save(new Report(parsedReport));
-  }
+  const [parsedPatientId, parsedReportId, parsedReport] =
+    await parsePatientData(patientDataFilePath);
+  // let existingPatient = await patientRepository.findOne({
+  //   where: {
+  //     id: patientId,
+  //   },
+  // });
+  // if (!existingPatient) {
+  //   existingPatient = await patientRepository.save(
+  //     new Patient({ ...parsedPatient, reports: [] })
+  //   );
+  // }
+  // const parsedReport = new Report({
+  //   id: report,
+  //   done: false,
+  //   createdAt: new Date(),
+  //   patient: existingPatient,
+  // });
+  // if (!existingReport) {
+  //   await reportRepository.save(new Report(parsedReport));
+  // }
   return PatientSyncEventStatus.DONE;
 }
 
