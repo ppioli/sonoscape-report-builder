@@ -10,10 +10,11 @@ import { DopplerFlow } from './DopplerFlow';
 import { Image } from './Image';
 import { PatientInstance } from './PatientInstance';
 
-interface ReportProps extends ReportData {
+export interface ReportProps extends ReportData {
   id?: string;
   patient: Patient;
 }
+
 @Entity()
 export class Report implements IReport {
   constructor(props?: ReportProps) {
@@ -24,6 +25,11 @@ export class Report implements IReport {
     this.patientInstance = props?.patientInstance ?? new PatientInstance();
     this.flow = props?.flow ?? new DopplerFlow();
     this.patient = props?.patient ?? new Patient();
+    if (props?.images) {
+      this.images = props.images.map((i) => {
+        return new Image(i);
+      });
+    }
     this.patientId = this.patient.id;
   }
 
@@ -50,6 +56,6 @@ export class Report implements IReport {
   @Column(() => DopplerFlow)
   flow: DopplerFlow;
 
-  @OneToMany(() => Image, (image) => image.report)
+  @OneToMany(() => Image, (image) => image.report, { cascade: true })
   images!: Image[];
 }

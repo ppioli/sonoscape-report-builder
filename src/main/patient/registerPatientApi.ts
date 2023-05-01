@@ -1,10 +1,11 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { PatientMessages } from './PatientMessages';
-import { ApiResponse, noResponse, okResponse } from '../../shared/ApiResponse';
+import { ApiResponse } from '../../shared/ApiResponse';
 import { PatientData } from '../../shared/model/PatientData';
 import Logger from '../Logger';
 import { getConfig } from '../config/registerConfigApi';
-import { readMaster } from './syncReports';
+import { MasterReader } from './masterReader';
+import { ClientException } from '../exception/ClientException';
 
 let _window: BrowserWindow | null = null;
 
@@ -13,7 +14,8 @@ export function registerPatientApi(window: BrowserWindow) {
   _window = window;
   const startSync = async () => {
     const config = await getConfig();
-    await readMaster(config.masterDir, (event) => {
+    const reader = new MasterReader(config.masterDir);
+    await reader.readMaster((event) => {
       window.webContents.send(PatientMessages.SYNC_EVENT, event);
     });
   };
@@ -24,16 +26,7 @@ export function registerPatientApi(window: BrowserWindow) {
       event: any,
       patientId: string
     ): Promise<ApiResponse<PatientData>> => {
-      try {
-        const patient: PatientData = {
-          id: patientId,
-          firstName: 'Pablo',
-          lastName: 'Pioli',
-        };
-        return okResponse(patient);
-      } catch (error: any) {
-        return noResponse(error);
-      }
+      throw new ClientException('Not implemented');
     }
   );
 

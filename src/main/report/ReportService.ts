@@ -1,15 +1,19 @@
-import { Repository } from 'typeorm';
-import { Report } from '../db/model/Report';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { Report, ReportProps } from '../db/model/Report';
 import db from '../db/db';
 import { ReportData } from '../../shared/model/ReportData';
 import { ClientException } from '../exception/ClientException';
 import { IPatientService, PatientService } from './PatientService';
+import Logger from '../Logger';
 
 export interface IReportService {
   reportGet(id: string): Promise<Report>;
+
   reportUpdate(id: string, data: ReportData): Promise<Report>;
+
   reportCreate(data: ReportData, patientId: string): Promise<Report>;
-  reportList(filter: { done: boolean }): Promise<Report[]>;
+
+  reportList(filter: FindOptionsWhere<Report>): Promise<Report[]>;
 }
 
 class ReportService implements IReportService {
@@ -22,7 +26,7 @@ class ReportService implements IReportService {
     this._patientService = new PatientService();
   }
 
-  reportList(filter: any): Promise<Report[]> {
+  reportList(filter: FindOptionsWhere<Report>): Promise<Report[]> {
     return this._repo.find({
       where: filter,
       relations: {
@@ -49,12 +53,13 @@ class ReportService implements IReportService {
     return report;
   }
 
-  public async reportCreate(
-    data: ReportData,
-    patientId: string
-  ): Promise<Report> {
-    const patient = await this._patientService.patientGet(patientId);
-    let report = new Report({ ...data, patient });
+  public async reportExist(id: string): Promise<boolean> {
+    return (await this._repo.count({ where: { id } })) > 1;
+  }
+
+  public async reportCreate(props: ReportProps): Promise<Report> {
+    Logger.info('Saving report', props);
+    let report = new Report(props);
     report = await this._repo.save(report);
 
     return report;
