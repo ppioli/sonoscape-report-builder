@@ -1,14 +1,12 @@
 import { Repository } from 'typeorm';
-import path from 'path';
+import fs from 'fs/promises';
 import { Image } from '../db/model/Image';
 import db from '../db/db';
 import { ClientException } from '../exception/ClientException';
-import { getConfig } from '../config/registerConfigApi';
 
 interface IImageService {
   imageGet(id: string): Promise<Image>;
-
-  imageGetData(id: string): Promise<string>;
+  imageGetData(id: string): Promise<string | null>;
 }
 
 class ImageService implements IImageService {
@@ -21,9 +19,6 @@ class ImageService implements IImageService {
   public async imageGet(id: string): Promise<Image> {
     const image = await this._repo.findOne({
       where: { id },
-      relations: {
-        report: true,
-      },
     });
     if (image == null) {
       throw new ClientException(`Image ${id} not found`);
@@ -32,19 +27,17 @@ class ImageService implements IImageService {
     return image;
   }
 
-  public async imageGetData(id: string): Promise<string> {
-    const config = await getConfig();
-    const image = await this.imageGet(id);
-    const imageFile = path.join(
-      config.masterDir,
-      image.report.patientId,
-      image.report.id,
-      image.id
-    );
-    // const base64 = await fs.readFile(imageFile, 'base64');
-    // const data = `data:image/gif;base64,${base64}`;
-
-    return imageFile;
+  public async imageGetData(id: string): Promise<string | null> {
+    try {
+      const image = await this.imageGet(id);
+      const base64 = await fs.readFile(image.fileName, 'base64');
+      return `data:image/gif;base64,${base64}`;
+    } catch (error: any) {
+      if (error.code === 'ENONET') {
+        return null;
+      }
+      throw error;
+    }
   }
 }
 

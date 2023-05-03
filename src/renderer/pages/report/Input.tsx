@@ -19,7 +19,10 @@ export function Input({
       <input
         {...rest}
         type={type ?? 'text'}
-        className={classNames('file-input w-full input-bordered', className)}
+        className={classNames(
+          'input w-full input-bordered input-md',
+          className
+        )}
       />
     </div>
   );

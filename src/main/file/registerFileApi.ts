@@ -19,7 +19,7 @@ export function registerFileApi() {
   );
   ipcMain.handle(
     FileMessages.GET_IMAGE_DATA,
-    async (_, imageId: string): Promise<ApiResponse<string>> => {
+    async (_, imageId: string): Promise<ApiResponse<string | null>> => {
       try {
         const image = await imageService.imageGetData(imageId);
         return okResponse(image);

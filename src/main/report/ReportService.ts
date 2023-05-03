@@ -46,7 +46,12 @@ class ReportService implements IReportService {
   }
 
   public async reportGet(id: string): Promise<Report> {
-    const report = await this._repo.findOneBy({ id });
+    const report = await this._repo.findOne({
+      where: { id },
+      relations: {
+        images: true,
+      },
+    });
     if (!report) {
       throw new ClientException(`Report ${id} not found`);
     }

@@ -1,7 +1,7 @@
-/* eslint import/prefer-default-export: off */
 import { URL } from 'url';
 import path from 'path';
 import { ApiError } from '../shared/ApiError';
+import Logger from './Logger';
 
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
@@ -13,17 +13,17 @@ export function resolveHtmlPath(htmlFileName: string) {
   return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
 
+export const isNodeError = (err: unknown): err is Error => err instanceof Error;
 
-export function processError( error: any ) : ApiError {
-  logError(error);
-  if( typeof error == 'string') {
-    return { error }
-  } else {
-    // TODO improve error handling
-    return { error: error.toString()}
-  }
+function logError(error: any) {
+  Logger.error(error);
 }
 
-function logError( error: any ) {
-  console.log(error)
+export function processError(error: any): ApiError {
+  logError(error);
+  if (typeof error === 'string') {
+    return { message: error };
+  }
+  // TODO improve error handling
+  return { message: error.toString() };
 }

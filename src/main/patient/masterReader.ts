@@ -164,7 +164,11 @@ export class MasterReader {
       await fs.mkdir(imageDir, {
         recursive: true,
       });
-      await fs.copyFile(from, path.join(imageDir, image.fileName));
+
+      const imagePath = path.join(imageDir, image.fileName);
+      await fs.copyFile(from, imagePath);
+
+      image.fileName = imagePath;
     }
 
     const patient = await patientService.patientCreateUpdate(
