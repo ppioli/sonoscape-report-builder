@@ -20,9 +20,9 @@ export function registerReportApi() {
     }
   );
   ipcMain.handle(
-    ReportMessages.SAVE,
+    ReportMessages.UPDATE,
     async (evt: any, id: string, report: ReportData) => {
-      Logger.info('Saving report file', report);
+      Logger.info('update report file', id, report);
       try {
         const result = await reportService.reportUpdate(id, report);
         return okResponse(result);
@@ -31,6 +31,17 @@ export function registerReportApi() {
       }
     }
   );
+  ipcMain.handle(ReportMessages.SAVE, async (evt: any, report: ReportData) => {
+    Logger.info('Saving report file', report);
+    try {
+      // TODO Patient?
+      const patientId = '';
+      const result = await reportService.reportCreate(report, patientId);
+      return okResponse(result);
+    } catch (err: any) {
+      return noResponse(err);
+    }
+  });
   ipcMain.handle(ReportMessages.LIST, async (evt: any, params) => {
     Logger.info('Listing reports', params);
     try {

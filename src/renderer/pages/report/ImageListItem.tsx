@@ -22,6 +22,7 @@ export function ImageListItem<
 >({ name, control }: ImageListItemProps<TFieldValues, TPath>) {
   const {
     field: { ref, value, onBlur, onChange },
+    fieldState,
   } = useController({
     control,
     name,
@@ -50,10 +51,11 @@ export function ImageListItem<
       {hover && (
         <div className="absolute w-full h-full p-5">
           <div className="flex flex-col justify-between align-middle w-full h-full">
-            <div>
-              <h2 className="card-title">{id}</h2>
-              <p className="break-all">{fileName}</p>
-            </div>
+            {/* <div> */}
+            {/*  <h2 className="card-title">{id}</h2> */}
+            {/*  <p className="break-all">{fileName}</p> */}
+            {/* </div> */}
+            {JSON.stringify(fieldState)}
             <div>
               <div className="card-actions justify-end">
                 <button className="btn btn-danger">Delete</button>

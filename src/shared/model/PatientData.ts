@@ -5,3 +5,11 @@ export interface PatientData {
   weight: number;
   size: string;
 }
+
+export const defaultPatient: () => PatientData = () => ({
+  firstName: '',
+  lastName: '',
+  age: '',
+  weight: 0,
+  size: '',
+});

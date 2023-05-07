@@ -3,7 +3,10 @@ import { Report, ReportProps } from '../db/model/Report';
 import db from '../db/db';
 import { ReportData } from '../../shared/model/ReportData';
 import { ClientException } from '../exception/ClientException';
-import { IPatientService, PatientService } from './PatientService';
+import patientService, {
+  IPatientService,
+  PatientService,
+} from './PatientService';
 import Logger from '../Logger';
 
 export interface IReportService {
@@ -36,10 +39,7 @@ class ReportService implements IReportService {
   }
 
   public async reportUpdate(id: string, data: ReportData): Promise<Report> {
-    const report = await this._repo.findOneBy({ id });
-    if (!report) {
-      throw new ClientException(`Report ${id} not found`);
-    }
+    const report = await this.reportGet(id);
     Object.assign(report, data);
     await this._repo.save(report);
     return report;
@@ -62,12 +62,14 @@ class ReportService implements IReportService {
     return (await this._repo.count({ where: { id } })) > 1;
   }
 
-  public async reportCreate(props: ReportProps): Promise<Report> {
-    Logger.info('Saving report', props);
-    let report = new Report(props);
-    report = await this._repo.save(report);
-
-    return report;
+  public async reportCreate(
+    report: ReportData,
+    patientId: string
+  ): Promise<Report> {
+    Logger.info('Saving report', report);
+    const patient = await patientService.patientGet(patientId);
+    const created = new Report({ ...report, patient });
+    return this._repo.save(created);
   }
 }
 

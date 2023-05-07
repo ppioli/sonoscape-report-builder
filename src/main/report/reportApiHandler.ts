@@ -12,6 +12,9 @@ export const reportApiHandler: ReportApi = {
   save(report: ReportData): Promise<ApiResponse<Report>> {
     return ipcRenderer.invoke(ReportMessages.SAVE, report);
   },
+  update(id: string, report: ReportData): Promise<ApiResponse<Report>> {
+    return ipcRenderer.invoke(ReportMessages.UPDATE, id, report);
+  },
   list(param: { pending: boolean }): Promise<ApiResponse<Report[]>> {
     return ipcRenderer.invoke(ReportMessages.LIST, param);
   },

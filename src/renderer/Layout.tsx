@@ -1,28 +1,20 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
+export const NAV_HEIGHT = 75;
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative">
+    <>
       <div
         className="navbar bg-primary text-primary-content fixed"
-        style={{ zIndex: 9999 }}
+        style={{ zIndex: 9999, height: NAV_HEIGHT, top: 0 }}
       >
         <div className="navbar-start">
           <Link to="/" className="btn btn-ghost normal-case text-xl">
             sonoReport
           </Link>
         </div>
-        <div className="navbar-center flex">
-          <ul className="menu menu-horizontal px-1">
-            <li>
-              <Link to="/reports">Reportes</Link>
-            </li>
-            <li>
-              <Link to="/patient">Pacientes</Link>
-            </li>
-          </ul>
-        </div>
+        <div className="navbar-center flex">{/* <input /> */}</div>
         <div className="navbar-end">
           <Link to="/config" className="btn btn-ghost btn-circle">
             <svg
@@ -43,9 +35,16 @@ export function Layout({ children }: { children: ReactNode }) {
           </Link>
         </div>
       </div>
-      <div className="container mx-auto px-4 py-8">
-        <div className="mt-12">{children}</div>
+      <div
+        className="overflow-y-auto w-full"
+        style={{
+          marginTop: NAV_HEIGHT,
+          maxHeight: `calc(100vh - ${NAV_HEIGHT}px)`,
+          height: `calc(100vh - ${NAV_HEIGHT}px)`,
+        }}
+      >
+        <div className="container mx-auto h-full p-4">{children}</div>
       </div>
-    </div>
+    </>
   );
 }

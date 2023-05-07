@@ -5,25 +5,34 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { reportSchema } from './reportSchema';
-import { ReportData } from '../../../shared/model/ReportData';
+import { defaultReport, ReportData } from '../../../shared/model/ReportData';
 import { Input } from './Input';
 import { ImageList } from './ImageList';
+import { api } from '../../api';
 
 enum Tabs {
   PATIENT = 'PATIENT',
   MEASUREMENTS = 'MEASUREMENTS',
   IMAGES = 'IMAGES',
+  FLOWS = 'FLOWS',
 }
 
-function ReportForm({ report }: { report: ReportData }) {
-  const { handleSubmit, register, control } = useForm({
+function ReportForm({ report, id }: { report: ReportData; id: string }) {
+  const { handleSubmit, control } = useForm({
     resolver: yupResolver(reportSchema),
     defaultValues: report,
   });
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.PATIENT);
 
-  const onSubmit = (value: ReportData) => {
-    console.log(value);
+  const onSubmit = async (value: ReportData) => {
+    if (id) {
+      try {
+        const result = await api.report.update(id, value);
+        console.log(result);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   };
 
   return (
@@ -56,6 +65,15 @@ function ReportForm({ report }: { report: ReportData }) {
         >
           Imagenes
         </button>
+        <button
+          type="button"
+          className={classNames('tab tab-lifted', {
+            'tab-active': selectedTab === Tabs.FLOWS,
+          })}
+          onClick={() => setSelectedTab(Tabs.FLOWS)}
+        >
+          Flujos
+        </button>
       </div>
       <div className="card card-compact bg-base-100 shadow-xl p-5">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -63,27 +81,34 @@ function ReportForm({ report }: { report: ReportData }) {
             className={classNames({ hidden: selectedTab !== Tabs.PATIENT })}
           >
             <Input
-              input={{ ...register('createdAt'), type: 'date' }}
+              control={control}
+              name="createdAt"
               label="Fecha"
+              type="date"
             />
-            <Input input={register('done')} />
+            <Input control={control} name="done" />
             <Input
               label="Nombre"
-              input={register('patientInstance.firstName')}
+              name="patientInstance.firstName"
+              control={control}
             />
             <Input
               label="Apellido"
-              input={register('patientInstance.lastName')}
+              control={control}
+              name="patientInstance.lastName"
             />
-            <Input label="Edad" input={register('patientInstance.age')} />
+            <Input label="Edad" name="patientInstance.age" control={control} />
             <Input
               label="Peso"
-              input={{
-                type: 'number',
-                ...register('patientInstance.weight', { valueAsNumber: true }),
-              }}
+              type="number"
+              control={control}
+              name="patientInstance.weight"
             />
-            <Input label="Talla" input={register('patientInstance.size')} />
+            <Input
+              label="Talla"
+              name="patientInstance.size"
+              control={control}
+            />
           </fieldset>
           <fieldset
             className={classNames({
@@ -92,61 +117,104 @@ function ReportForm({ report }: { report: ReportData }) {
           >
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Input label="AO" input={register('measurements.ao')} />
-                <Input label="AI" input={register('measurements.ai')} />
-                <Input label="VIDD" input={register('measurements.vidd')} />
-                <Input label="VIDS" input={register('measurements.vids')} />
+                <Input label="AO" name="measurements.ao" control={control} />
+                <Input label="AI" control={control} name="measurements.ai" />
+                <Input
+                  label="VIDD"
+                  control={control}
+                  name="measurements.vidd"
+                />
+                <Input
+                  label="VIDS"
+                  control={control}
+                  name="measurements.vids"
+                />
               </div>
               <div>
-                <Input label="FA" input={register('measurements.fa')} />
-                <Input label="SEPTUM" input={register('measurements.septum')} />
+                <Input label="FA" control={control} name="measurements.fa" />
+                <Input
+                  label="SEPTUM"
+                  control={control}
+                  name="measurements.septum"
+                />
                 <Input
                   label="P POSTERIOR"
-                  input={register('measurements.pposterior')}
+                  control={control}
+                  name="measurements.pposterior"
                 />
-                <Input label="VD" input={register('measurements.vd')} />
+                <Input label="VD" control={control} name="measurements.vd" />
               </div>
               <div>
-                <Input label="AD" input={register('measurements.ad')} />
-                <Input label="Pulmon" input={register('measurements.pulmon')} />
-                <Input label="Fey" input={register('measurements.fey')} />
+                <Input label="AD" control={control} name="measurements.ad" />
+                <Input
+                  label="Pulmon"
+                  control={control}
+                  name="measurements.pulmon"
+                />
+                <Input label="Fey" control={control} name="measurements.fey" />
               </div>
             </div>
             <Input
               label="Ventriculo Izquierdo"
-              input={register('measurements.ventriculoIzquierdo')}
+              control={control}
+              name="measurements.ventriculoIzquierdo"
             />
             <Input
               label="Ventriculo Derecho"
-              input={register('measurements.ventriculoDerecho')}
+              control={control}
+              name="measurements.ventriculoDerecho"
             />
             <Input
               label="Auricula Izquierda"
-              input={register('measurements.auriculaDerecha')}
+              control={control}
+              name="measurements.auriculaDerecha"
             />
             <Input
               label="Auricula Derecha"
-              input={register('measurements.auriculaIzquierda')}
+              control={control}
+              name="measurements.auriculaIzquierda"
             />
             <Input
               label="Valvula Aortica"
-              input={register('measurements.valvulaAortica')}
+              control={control}
+              name="measurements.valvulaAortica"
             />
             <Input
               label="Valvula Mitral"
-              input={register('measurements.valvulaMitral')}
+              control={control}
+              name="measurements.valvulaMitral"
             />
             <Input
               label="Valvula Pulmonar"
-              input={register('measurements.valvulaPulmonar')}
+              control={control}
+              name="measurements.valvulaPulmonar"
             />
             <Input
               label="Valvula Tricuspidea"
-              input={register('measurements.valvulaTricuspidea')}
+              control={control}
+              name="measurements.valvulaTricuspidea"
             />
             <Input
               label="Pericardio"
-              input={register('measurements.valvulaTricuspidea')}
+              control={control}
+              name="measurements.pericardio"
+            />
+          </fieldset>
+          <fieldset
+            className={classNames({ hidden: selectedTab !== Tabs.FLOWS })}
+          >
+            <Input label="Aortico" control={control} name="flow.aortico" />
+            <Input label="Mitral" control={control} name="flow.mitral" />
+            <Input label="Pulmonar" control={control} name="flow.pulmonar" />
+            <Input
+              label="Tricuspedeo"
+              control={control}
+              name="flow.tricuspideo"
+            />
+            <Input
+              label="Conclusiones"
+              control={control}
+              name="flow.conclusiones"
             />
           </fieldset>
           <fieldset
@@ -154,7 +222,6 @@ function ReportForm({ report }: { report: ReportData }) {
           >
             <ImageList control={control} name="images" />
           </fieldset>
-
           <button type="submit" className="btn">
             Guardar
           </button>
@@ -171,7 +238,13 @@ export function ReportDetailPage() {
     value: report,
     loading,
     error,
-  } = useApi((api) => api.report.read(reportId), [reportId]);
+  } = useApi(
+    (api) =>
+      reportId === ''
+        ? Promise.resolve({ value: defaultReport() })
+        : api.report.read(reportId),
+    [reportId]
+  );
 
   if (!report) {
     // todo handle error
@@ -179,7 +252,7 @@ export function ReportDetailPage() {
   }
   return (
     <div>
-      <ReportForm report={report} />
+      <ReportForm report={report} id={reportId} />
     </div>
   );
 }
