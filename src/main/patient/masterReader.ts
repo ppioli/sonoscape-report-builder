@@ -16,6 +16,7 @@ import { defaultMeasurements } from '../../shared/model/MeasurementsData';
 import patientService from '../report/PatientService';
 import reportService from '../report/ReportService';
 import { AppDataDir } from '../config/registerConfigApi';
+import { Report } from '../db/model/Report';
 
 export class MasterReader {
   private readonly _masterDir: string;
@@ -144,10 +145,10 @@ export class MasterReader {
     );
 
     // Parse and update the patient
-    const report = await this.parseReport(patientDataFilePath);
+    const reportData = await this.parseReport(patientDataFilePath);
 
     // copy images
-    for (const image of report.images) {
+    for (const image of reportData.images) {
       const from = path.join(
         this._masterDir,
         patientPath,
@@ -173,14 +174,15 @@ export class MasterReader {
 
     const patient = await patientService.patientCreateUpdate(
       patientId,
-      report.patientInstance
+      reportData.patientInstance
     );
 
-    return reportService.reportCreate({
+    const report: Report = new Report({
       id: reportId,
       patient,
-      ...report,
+      ...reportData,
     });
+    return reportService.reportCreate(report, patient);
   }
 
   private static async findDirectories(directory: string) {

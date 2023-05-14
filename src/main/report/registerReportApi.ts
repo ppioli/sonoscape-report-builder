@@ -5,6 +5,7 @@ import Logger from '../Logger';
 import { ReportData } from '../../shared/model/ReportData';
 import reportService from './ReportService';
 import { Report } from '../db/model/Report';
+import { Patient } from '../db/model/Patient';
 
 export function registerReportApi() {
   ipcMain.handle(
@@ -13,6 +14,7 @@ export function registerReportApi() {
       Logger.info('Read report api called', reportId);
       try {
         const report = await reportService.reportGet(reportId);
+        Logger.info('Returning ', report);
         return okResponse(report);
       } catch (error: any) {
         return noResponse(error);
@@ -35,8 +37,7 @@ export function registerReportApi() {
     Logger.info('Saving report file', report);
     try {
       // TODO Patient?
-      const patientId = '';
-      const result = await reportService.reportCreate(report, patientId);
+      const result = await reportService.reportCreate(report, new Patient());
       return okResponse(result);
     } catch (err: any) {
       return noResponse(err);

@@ -8,13 +8,14 @@ import patientService, {
   PatientService,
 } from './PatientService';
 import Logger from '../Logger';
+import { Patient } from '../db/model/Patient';
 
 export interface IReportService {
   reportGet(id: string): Promise<Report>;
 
   reportUpdate(id: string, data: ReportData): Promise<Report>;
 
-  reportCreate(data: ReportData, patientId: string): Promise<Report>;
+  reportCreate(data: ReportData, patient: Patient): Promise<Report>;
 
   reportList(filter: FindOptionsWhere<Report>): Promise<Report[]>;
 }
@@ -50,6 +51,7 @@ class ReportService implements IReportService {
       where: { id },
       relations: {
         images: true,
+        patient: true,
       },
     });
     if (!report) {
@@ -64,10 +66,9 @@ class ReportService implements IReportService {
 
   public async reportCreate(
     report: ReportData,
-    patientId: string
+    patient: Patient
   ): Promise<Report> {
     Logger.info('Saving report', report);
-    const patient = await patientService.patientGet(patientId);
     const created = new Report({ ...report, patient });
     return this._repo.save(created);
   }

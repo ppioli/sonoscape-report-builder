@@ -30,7 +30,6 @@ export class Report implements IReport {
         return new Image(i);
       });
     }
-    this.patientId = this.patient.id;
   }
 
   @Column()
@@ -44,8 +43,6 @@ export class Report implements IReport {
 
   @ManyToOne(() => Patient, (patient) => patient.reports)
   patient: Patient;
-
-  patientId: string;
 
   @Column(() => PatientInstance)
   patientInstance: PatientInstance;

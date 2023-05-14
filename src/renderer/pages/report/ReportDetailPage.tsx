@@ -23,8 +23,10 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
     defaultValues: report,
   });
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.PATIENT);
+  console.log('report', report);
 
   const onSubmit = async (value: ReportData) => {
+    console.log(value);
     if (id) {
       try {
         const result = await api.report.update(id, value);
