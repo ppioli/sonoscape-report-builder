@@ -9,6 +9,8 @@ import patientService, {
 } from './PatientService';
 import Logger from '../Logger';
 import { Patient } from '../db/model/Patient';
+import { fetchPaginated, Page } from '../common/Pagination';
+import { PaginatedQuery } from '../common/PaginatedQuery';
 
 export interface IReportService {
   reportGet(id: string): Promise<Report>;
@@ -17,7 +19,7 @@ export interface IReportService {
 
   reportCreate(data: ReportData, patient: Patient): Promise<Report>;
 
-  reportList(filter: FindOptionsWhere<Report>): Promise<Report[]>;
+  reportList(opts: PaginatedQuery<Report>): Promise<Page<Report>>;
 }
 
 class ReportService implements IReportService {
@@ -30,18 +32,17 @@ class ReportService implements IReportService {
     this._patientService = new PatientService();
   }
 
-  reportList(filter: FindOptionsWhere<Report>): Promise<Report[]> {
-    return this._repo.find({
-      where: filter,
-      relations: {
-        patient: true,
-      },
+  reportList(opts: PaginatedQuery<Report>): Promise<Page<Report>> {
+    return fetchPaginated({
+      repository: this._repo,
+      ...opts,
     });
   }
 
   public async reportUpdate(id: string, data: ReportData): Promise<Report> {
     const report = await this.reportGet(id);
     Object.assign(report, data);
+    report.done = true;
     await this._repo.save(report);
     return report;
   }

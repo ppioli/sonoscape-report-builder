@@ -33,3 +33,7 @@ declare module '*.css' {
   const content: Styles;
   export default content;
 }
+declare module '*.ttf' {
+  const content: string;
+  export default content;
+}

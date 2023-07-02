@@ -31,7 +31,7 @@ class ImageService implements IImageService {
     try {
       const image = await this.imageGet(id);
       const base64 = await fs.readFile(image.fileName, 'base64');
-      return `data:image/gif;base64,${base64}`;
+      return `data:image/jpeg;base64,${base64}`;
     } catch (error: any) {
       if (error.code === 'ENONET') {
         return null;

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import classNames from 'classnames';
@@ -18,20 +18,19 @@ enum Tabs {
 }
 
 function ReportForm({ report, id }: { report: ReportData; id: string }) {
+  const navigate = useNavigate();
   const { handleSubmit, control } = useForm({
     resolver: yupResolver(reportSchema),
     defaultValues: report,
   });
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.PATIENT);
-  console.log('report', report);
 
   const onSubmit = async (value: ReportData) => {
-    console.log(value);
     if (id) {
       try {
         const result = await api.report.update(id, value);
-        console.log(result);
       } catch (e) {
+        // Todo fix this
         console.error(e);
       }
     }
@@ -61,20 +60,20 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
         <button
           type="button"
           className={classNames('tab tab-lifted', {
-            'tab-active': selectedTab === Tabs.IMAGES,
-          })}
-          onClick={() => setSelectedTab(Tabs.IMAGES)}
-        >
-          Imagenes
-        </button>
-        <button
-          type="button"
-          className={classNames('tab tab-lifted', {
             'tab-active': selectedTab === Tabs.FLOWS,
           })}
           onClick={() => setSelectedTab(Tabs.FLOWS)}
         >
           Flujos
+        </button>
+        <button
+          type="button"
+          className={classNames('tab tab-lifted', {
+            'tab-active': selectedTab === Tabs.IMAGES,
+          })}
+          onClick={() => setSelectedTab(Tabs.IMAGES)}
+        >
+          Imagenes
         </button>
       </div>
       <div className="card card-compact bg-base-100 shadow-xl p-5">
@@ -88,7 +87,7 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
               label="Fecha"
               type="date"
             />
-            <Input control={control} name="done" />
+            <Input className="hidden" control={control} name="done" />
             <Input
               label="Nombre"
               name="patientInstance.firstName"
@@ -96,6 +95,11 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
             />
             <Input
               label="Apellido"
+              control={control}
+              name="patientInstance.lastName"
+            />
+            <Input
+              label="DNI"
               control={control}
               name="patientInstance.lastName"
             />
@@ -107,7 +111,12 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
               name="patientInstance.weight"
             />
             <Input
-              label="Talla"
+              label="Altura"
+              name="patientInstance.size"
+              control={control}
+            />
+            <Input
+              label="Medico Solicitante"
               name="patientInstance.size"
               control={control}
             />
@@ -153,7 +162,7 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
                   control={control}
                   name="measurements.pulmon"
                 />
-                <Input label="Fey" control={control} name="measurements.fey" />
+                <Input label="FEy" control={control} name="measurements.fey" />
               </div>
             </div>
             <Input
@@ -224,15 +233,25 @@ function ReportForm({ report, id }: { report: ReportData; id: string }) {
           >
             <ImageList control={control} name="images" />
           </fieldset>
-          <button type="submit" className="btn">
-            Guardar
-          </button>
+          <div className="w-full flex flex-row-reverse mt-4">
+            <button type="submit" className="btn">
+              Guardar
+            </button>
+            <button type="button" className="btn" onClick={() => navigate(-1)}>
+              Volver
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 }
-
+/*
+FA => Regla 3 simple
+VIDD => Diastoligo grande
+VIDS => Sistoligo expluso => Chico
+AD / AI => Aurticulas
+ */
 export function ReportDetailPage() {
   const params = useParams();
   const reportId = params.id ?? '';

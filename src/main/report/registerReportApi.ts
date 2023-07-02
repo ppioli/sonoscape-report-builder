@@ -6,6 +6,7 @@ import { ReportData } from '../../shared/model/ReportData';
 import reportService from './ReportService';
 import { Report } from '../db/model/Report';
 import { Patient } from '../db/model/Patient';
+import { PaginatedQuery } from '../common/PaginatedQuery';
 
 export function registerReportApi() {
   ipcMain.handle(
@@ -43,15 +44,17 @@ export function registerReportApi() {
       return noResponse(err);
     }
   });
-  ipcMain.handle(ReportMessages.LIST, async (evt: any, params) => {
-    Logger.info('Listing reports', params);
-    try {
-      const filter = params.pending ? { done: false } : {};
-      const result = await reportService.reportList(filter);
-      Logger.info('List report ok', result);
-      return okResponse(result);
-    } catch (err: any) {
-      return noResponse(err);
+  ipcMain.handle(
+    ReportMessages.LIST,
+    async (evt: any, params: PaginatedQuery<Report>) => {
+      Logger.info('Listing reports', params);
+      try {
+        const result = await reportService.reportList(params);
+        Logger.info('List report ok', result);
+        return okResponse(result);
+      } catch (err: any) {
+        return noResponse(err);
+      }
     }
-  });
+  );
 }

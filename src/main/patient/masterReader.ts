@@ -1,4 +1,6 @@
 import { readdir, stat } from 'node:fs/promises';
+// @ts-ignore todo
+import Jimp from 'jimp';
 import path from 'path';
 import fs from 'fs/promises';
 import { XMLParser } from 'fast-xml-parser';
@@ -166,9 +168,20 @@ export class MasterReader {
         recursive: true,
       });
 
-      const imagePath = path.join(imageDir, image.fileName);
-      await fs.copyFile(from, imagePath);
-
+      // todo replace extension instead of just appending the correct one
+      const imagePath = `${path.join(imageDir, image.fileName)}.jpg`;
+      // await fs.copyFile(from, imagePath);
+      await Jimp.read(from)
+        .then((lenna: any) => {
+          return lenna
+            .resize(256, 256) // resize
+            .quality(100) // set JPEG quality
+            .greyscale() // set greyscale
+            .write(imagePath); // save
+        })
+        .catch((err: any) => {
+          console.error(err);
+        });
       image.fileName = imagePath;
     }
 
