@@ -2,7 +2,7 @@ import { MouseEventHandler, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { Report } from '../../../main/db/model/Report';
+import { Report } from '../../../../main/db/model/Report';
 
 export function ReportListItem({ report }: { report: Report }) {
   const [active, setActive] = useState(false);

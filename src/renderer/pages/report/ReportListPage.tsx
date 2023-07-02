@@ -1,5 +1,5 @@
-import { ReportList } from './ReportList';
+import { ReportTable } from './table/ReportTable';
 
 export function ReportListPage() {
-  return <ReportList />;
+  return <ReportTable />;
 }

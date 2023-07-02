@@ -9,7 +9,7 @@ export interface Page<T> {
   totalPages: number;
 }
 
-const DefaultPageSize: number = 20;
+const DefaultPageSize: number = 10;
 export interface FetchPaginatedOpts<T extends {}> extends PaginatedQuery<T> {
   repository: Repository<T>;
 }

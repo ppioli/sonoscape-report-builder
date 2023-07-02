@@ -1,12 +1,7 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import 'tailwindcss/tailwind.css';
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from 'react-query';
+import './globals.css';
+
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { ConfigPage } from './pages/config/ConfigPage';
 import HomePage from './pages/home/HomePage';
 import { Layout } from './Layout';

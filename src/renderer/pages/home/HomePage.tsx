@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import classNames from 'classnames';
-import { ReportList } from '../report/ReportList';
+import { ReportTable } from '@/renderer/pages/report/table/ReportTable';
 import { SyncComponent } from '../patient/SyncPage';
 
 enum HomeTabs {
@@ -52,7 +52,7 @@ function Home() {
         {/*  <p>Listado de reportes pendientes</p> */}
         {/* </div> */}
         <div className="flex-grow justify-items-center">
-          <ReportList hack={hack} pending />
+          <ReportTable />
         </div>
       </div>
       <div
@@ -65,7 +65,7 @@ function Home() {
         {/*  <p>Listado de reportes</p> */}
         {/* </div> */}
         <div className="flex-grow justify-items-center">
-          <ReportList hack={hack} pending={false} />
+          <ReportTable />
         </div>
       </div>
     </div>

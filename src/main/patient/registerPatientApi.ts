@@ -15,9 +15,11 @@ export function registerPatientApi(window: BrowserWindow) {
   const startSync = async () => {
     const config = await getConfig();
     const reader = new MasterReader(config.masterDir);
-    await reader.readMaster((event) => {
-      window.webContents.send(PatientMessages.SYNC_EVENT, event);
-    });
+    for (let i = 1; i < 100; i++) {
+      await reader.readMaster((event) => {
+        window.webContents.send(PatientMessages.SYNC_EVENT, event);
+      });
+    }
   };
 
   ipcMain.handle(

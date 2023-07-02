@@ -15,7 +15,12 @@
     "allowJs": true,
     "outDir": ".erb/dll",
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "paths": {
+      "@/renderer/*": ["renderer/*"],
+      "@/shared/*": ["shared/*"],
+      "@/main/*": ["main/*"]
+    }
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

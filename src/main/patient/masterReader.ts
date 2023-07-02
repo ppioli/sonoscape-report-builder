@@ -100,13 +100,14 @@ export class MasterReader {
       });
     }
 
+    const [lastName, firstName] = p.DicomPatientName.split('^');
     return {
       createdAt: new Date(),
       done: false,
       images,
       patientInstance: {
-        firstName: p.PatientName,
-        lastName: p.PatientName,
+        firstName,
+        lastName,
         age: p.age ?? 0,
         size: p.size ?? '',
         weight: p.weight ?? 0,
@@ -124,10 +125,15 @@ export class MasterReader {
     const directory = path.join(this._masterDir, patientPath, reportPath);
     const files = await readdir(directory);
     // the reportId is the same as the path
-    const patientId = MasterReader.extractPatientId(patientPath);
-    const reportId = reportPath;
+    const patientId = uuuid(); // MasterReader.extractPatientId(patientPath);
+    const reportId = uuuid(); // reportPath;
     const patientXmlFile = files.filter(
-      (f) => f.match(`Report_Cardiac${patientId}[0-9]+\\.xml`)?.length
+      (f) =>
+        f.match(
+          `Report_Cardiac${MasterReader.extractPatientId(
+            patientPath
+          )}[0-9]+\\.xml`
+        )?.length
     );
 
     if (patientXmlFile.length !== 1) {
@@ -136,7 +142,7 @@ export class MasterReader {
         files
       );
       throw new ClientException(
-        `No puedo encontrarse la informacion del reporte ${reportPath} para el paciente ${patientPath}`
+        `No pudo encontrarse la informacion del reporte ${reportPath} para el paciente ${patientPath}`
       );
     }
     const patientDataFilePath = path.join(
